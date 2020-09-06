@@ -6,7 +6,8 @@ namespace myhomework
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Random random = new Random();
+            Console.WriteLine("Hello World! You random number it" + random.Next(1-3));
         }
     }
 }
