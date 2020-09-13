@@ -14,6 +14,11 @@ namespace week7
             Name = name;
             Score = new Score(0);
         }
+        public User(string name,int score)
+        {
+            Name = name;
+            Score = new Score(score);
+        }
 
         public void Choose(Answer answer)
         {
