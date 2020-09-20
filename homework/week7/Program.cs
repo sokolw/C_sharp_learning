@@ -7,7 +7,15 @@ namespace week7
         static void Main(string[] args)
         {
             Game game = new Game();
-            game.Prepare();
+            try
+            {
+                game.Prepare();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Файл с вопросам не найден. Поместите его рядом с исполняемым файлом игры. Название файла: questions.txt");
+                return;
+            }
             game.Start();
         }
     }
