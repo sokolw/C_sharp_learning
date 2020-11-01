@@ -19,14 +19,7 @@ namespace Millionaires
 
         public void Prepare()
         {
-            try
-            {
-                Questions = IOGameData.LoadQuestions();
-            }
-            catch (FileNotFoundException e)
-            {
-                throw e;
-            }
+            Questions = IOGameData.LoadQuestions();
         }
 
         public void Start()
@@ -63,7 +56,7 @@ namespace Millionaires
             Console.WriteLine($"Ваш {i + 1}-ый вопрос:\n\r\n\r{Questions[i].QuestionText}\n\r" +
                     $"Варианты ответа:\n\r");
 
-            for (int a = 0; a < Questions[i].Answers.Length; a++)
+            for (int a = 0; a < Questions[i].Answers.Count; a++)
                 Console.WriteLine($"{a + 1}. {Questions[i].Answers[a].AnswerText};\n\r");
         }
 
@@ -142,74 +135,6 @@ namespace Millionaires
             }
         }
 
-        private void Save(int stage)
-        {
-            string directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments,0) + "/Millionaires";
-            DirectoryInfo directory = new DirectoryInfo(directoryPath);
-            if (!directory.Exists)
-            {
-                directory.Create();
-            }
-
-            directoryPath += "/" + User.Name;
-            if (directory.GetDirectories(User.Name).Length == 0)
-            {  
-                directory = new DirectoryInfo(directoryPath);
-                directory.Create();
-            }
-
-            Console.WriteLine("Введите имя сохранения от 4 до 32 символов: ");
-            FileInfo saveFileInfo = new FileInfo(directoryPath + "/" + InputSaveOrLoadSymbols() + ".txt");
-            if (saveFileInfo.Exists)
-            {
-                Console.WriteLine("Сохранение с таким названием уже существует, попробуйте снова. Введите: save или s");
-                return;
-            }
-            FileStream saveFileStream = saveFileInfo.OpenWrite();
-            using (StreamWriter saveStreamWriter = new StreamWriter(saveFileStream,Encoding.UTF8))
-            {
-                saveStreamWriter.Write($"{User.Name}\n{User.Score.Number}\n{stage}");
-            }
-        }
-
-        private int Load()
-        {
-            string directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, 0) + "/Millionaires";
-            DirectoryInfo directory = new DirectoryInfo(directoryPath);
-            if (!directory.Exists)
-            {
-                Console.WriteLine("Вы ещё ни разу не играли. Создание новой игры...");
-                return 0;
-            }
-            //смотрим папки
-            Console.WriteLine("Выберите номер папки с сохранениями: ");
-            DirectoryInfo[] directoryArray = directory.GetDirectories();
-            for(int i = 0; i< directoryArray.Length; i++)
-            {
-                Console.WriteLine($"{i+1}. {directoryArray[i].Name}");
-            }
-            //смотрим файлы
-            directoryPath += "/" + directoryArray[InputNumberOfRange(directoryArray.Length)].Name;
-            Console.WriteLine("Выберите номер номер файла с сохранением: ");
-            directory = new DirectoryInfo(directoryPath);
-            FileInfo[] fileArray = directory.GetFiles();
-            for (int i = 0; i < fileArray.Length; i++)
-            {
-                Console.WriteLine($"{i + 1}. {fileArray[i].Name}");
-            }
-            //читаем файл
-            directoryPath+= "/" + fileArray[InputNumberOfRange(fileArray.Length)].Name;
-            FileInfo loadFileInfo = new FileInfo(directoryPath);
-            FileStream loadFileStream = loadFileInfo.OpenRead();
-            using (StreamReader loadStreamReader = new StreamReader(loadFileStream, Encoding.UTF8))
-            {
-                string data = loadStreamReader.ReadToEnd();
-                string[] fields = data.Split("\n");
-                User = new User(fields[0],int.Parse(fields[1]));
-                return int.Parse(fields[2]);
-            }
-        }
-
         private bool ChooseGame()
         {
             Console.WriteLine("Игра \"Кто хочет стать миллионером\"");
@@ -245,6 +170,74 @@ namespace Millionaires
             }
             Console.WriteLine($"Введите число от 1 до {range}");
             return InputNumberOfRange(range);
+        }
+
+        private void Save(int stage)
+        {
+            string directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, 0) + "/Millionaires";
+            DirectoryInfo directory = new DirectoryInfo(directoryPath);
+            if (!directory.Exists)
+            {
+                directory.Create();
+            }
+
+            directoryPath += "/" + User.Name;
+            if (directory.GetDirectories(User.Name).Length == 0)
+            {
+                directory = new DirectoryInfo(directoryPath);
+                directory.Create();
+            }
+
+            Console.WriteLine("Введите имя сохранения от 4 до 32 символов: ");
+            FileInfo saveFileInfo = new FileInfo(directoryPath + "/" + InputSaveOrLoadSymbols() + ".txt");
+            if (saveFileInfo.Exists)
+            {
+                Console.WriteLine("Сохранение с таким названием уже существует, попробуйте снова. Введите: save или s");
+                return;
+            }
+            FileStream saveFileStream = saveFileInfo.OpenWrite();
+            using (StreamWriter saveStreamWriter = new StreamWriter(saveFileStream, Encoding.UTF8))
+            {
+                saveStreamWriter.Write($"{User.Name}\n{User.Score.Number}\n{stage}");
+            }
+        }
+
+        private int Load()
+        {
+            string directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, 0) + "/Millionaires";
+            DirectoryInfo directory = new DirectoryInfo(directoryPath);
+            if (!directory.Exists)
+            {
+                Console.WriteLine("Вы ещё ни разу не играли. Создание новой игры...");
+                return 0;
+            }
+            //смотрим папки
+            Console.WriteLine("Выберите номер папки с сохранениями: ");
+            DirectoryInfo[] directoryArray = directory.GetDirectories();
+            for (int i = 0; i < directoryArray.Length; i++)
+            {
+                Console.WriteLine($"{i + 1}. {directoryArray[i].Name}");
+            }
+            //смотрим файлы
+            directoryPath += "/" + directoryArray[InputNumberOfRange(directoryArray.Length)].Name;
+            Console.WriteLine("Выберите номер номер файла с сохранением: ");
+            directory = new DirectoryInfo(directoryPath);
+            FileInfo[] fileArray = directory.GetFiles();
+            for (int i = 0; i < fileArray.Length; i++)
+            {
+                Console.WriteLine($"{i + 1}. {fileArray[i].Name}");
+            }
+            //читаем файл
+            directoryPath += "/" + fileArray[InputNumberOfRange(fileArray.Length)].Name;
+            FileInfo loadFileInfo = new FileInfo(directoryPath);
+            FileStream loadFileStream = loadFileInfo.OpenRead();
+            using (StreamReader loadStreamReader = new StreamReader(loadFileStream, Encoding.UTF8))
+            {
+                string data = loadStreamReader.ReadToEnd();
+                string[] fields = data.Split("\n");
+                User = new User(fields[0], int.Parse(fields[1]));
+                return int.Parse(fields[2]);
+            }
         }
     }
 }
